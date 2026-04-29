@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import { doc, setDoc, deleteDoc } from 'firebase/firestore'
+import { doc, setDoc, deleteDoc, arrayUnion } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import type { InspiratieItem, Person } from '@/types'
+import type { InspiratieItem, InspiratieComment, Person } from '@/types'
 import { generateId } from '@/utils/generateId'
 import { stripUndefined } from '@/utils/stripUndefined'
+import { useVerlangStore } from '@/stores/useVerlangStore'
 
 interface InspiratieState {
   items: InspiratieItem[]
@@ -13,6 +14,7 @@ interface InspiratieState {
   toggleFavorite: (id: string) => Promise<void>
   toggleViewed: (id: string) => Promise<void>
   vote: (id: string, voter: Person, vote: 'ja' | 'nee') => Promise<void>
+  addComment: (id: string, author: Person, text: string) => Promise<void>
   deleteItem: (id: string) => Promise<void>
   unreadCount: () => number
 }
@@ -26,6 +28,8 @@ export const useInspiratieStore = create<InspiratieState>()((set, get) => ({
       id: generateId(), title, url, addedBy, notes,
       viewed: false, favorite: false, isNew: true,
       votes: { max: null, medina: null },
+      comments: [],
+      addedToVerlang: false,
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [item, ...s.items] }))
@@ -53,16 +57,46 @@ export const useInspiratieStore = create<InspiratieState>()((set, get) => ({
     await setDoc(doc(db, 'inspiratie', id), { viewed: true, isNew: false }, { merge: true })
   },
 
-  vote: async (id, voter, vote) => {
-    const field = `votes.${voter.toLowerCase()}`
+  vote: async (id, voter, v) => {
+    const item = get().items.find((i) => i.id === id)
+    if (!item) return
+
+    const existingVotes = item.votes ?? { max: null, medina: null }
+    const updatedVotes = { ...existingVotes, [voter.toLowerCase()]: v }
+
+    // Check of beide nu 'ja' hebben gestemd en item nog niet is toegevoegd
+    const bothJa = updatedVotes.max === 'ja' && updatedVotes.medina === 'ja'
+    const shouldAddToVerlang = bothJa && !item.addedToVerlang
+
     set((s) => ({
-      items: s.items.map((i) => {
-        if (i.id !== id) return i
-        const existingVotes = i.votes ?? { max: null, medina: null }
-        return { ...i, votes: { ...existingVotes, [voter.toLowerCase()]: vote } }
-      }),
+      items: s.items.map((i) => i.id === id
+        ? { ...i, votes: updatedVotes, addedToVerlang: shouldAddToVerlang ? true : i.addedToVerlang }
+        : i
+      ),
     }))
-    await setDoc(doc(db, 'inspiratie', id), { [field]: vote }, { merge: true })
+
+    const field = `votes.${voter.toLowerCase()}`
+    const update: Record<string, unknown> = { [field]: v }
+    if (shouldAddToVerlang) update.addedToVerlang = true
+    await setDoc(doc(db, 'inspiratie', id), update, { merge: true })
+
+    if (shouldAddToVerlang) {
+      await useVerlangStore.getState().addItem(item.title, 'Middel', item.addedBy, item.notes, item.url)
+    }
+  },
+
+  addComment: async (id, author, text) => {
+    const comment: InspiratieComment = {
+      id: generateId(), author, text,
+      createdAt: new Date().toISOString(),
+    }
+    set((s) => ({
+      items: s.items.map((i) => i.id === id
+        ? { ...i, comments: [...(i.comments ?? []), comment] }
+        : i
+      ),
+    }))
+    await setDoc(doc(db, 'inspiratie', id), { comments: arrayUnion(comment) }, { merge: true })
   },
 
   deleteItem: async (id) => {

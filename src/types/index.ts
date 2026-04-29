@@ -59,6 +59,13 @@ export interface InspiratieVotes {
   medina: 'ja' | 'nee' | null
 }
 
+export interface InspiratieComment {
+  id: string
+  author: Person
+  text: string
+  createdAt: string
+}
+
 export interface InspiratieItem {
   id: string
   title: string
@@ -69,6 +76,8 @@ export interface InspiratieItem {
   addedBy: Person
   isNew: boolean
   votes: InspiratieVotes
+  comments?: InspiratieComment[]
+  addedToVerlang?: boolean
   createdAt: string
 }
 
