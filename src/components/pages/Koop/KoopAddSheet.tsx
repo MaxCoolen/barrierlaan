@@ -11,13 +11,14 @@ export default function KoopAddSheet({ open, onClose }: Props) {
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [store, setStore] = useState('')
+  const [url, setUrl] = useState('')
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
-    addItem(name.trim(), quantity, store.trim() || undefined)
+    addItem(name.trim(), quantity, store.trim() || undefined, url.trim() || undefined)
     toast('Item toegevoegd! 🛒')
-    setName(''); setQuantity(1); setStore('')
+    setName(''); setQuantity(1); setStore(''); setUrl('')
     onClose()
   }
 
@@ -60,6 +61,17 @@ export default function KoopAddSheet({ open, onClose }: Props) {
             value={store}
             onChange={(e) => setStore(e.target.value)}
             placeholder="Bijv. IKEA, Action, Gamma"
+            className="input-field"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-warm-gray mb-1.5">Website <span className="text-warm-muted font-normal">(optioneel)</span></label>
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://..."
             className="input-field"
           />
         </div>

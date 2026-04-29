@@ -18,6 +18,7 @@ export interface KoopItem {
   name: string
   quantity: number
   store?: string
+  url?: string
   bought: boolean
   createdAt: string
 }

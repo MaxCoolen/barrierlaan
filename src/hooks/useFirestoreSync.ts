@@ -22,6 +22,7 @@ export function useFirestoreSync() {
   const setPlanning  = usePlanningStore((s) => s._setItems)
   const setMoveDate  = usePlanningStore((s) => s._setMoveDate)
   const setInspiratie = useInspiratieStore((s) => s._setItems)
+  const setBudget    = useKostenStore((s) => s._setBudget)
   const setDOzen     = useDozenStore((s) => s._setItems)
   const setVerlang   = useVerlangStore((s) => s._setItems)
 
@@ -86,6 +87,11 @@ export function useFirestoreSync() {
         (snap) => { setVerlang(snap.docs.map((d) => ({ id: d.id, ...d.data() } as VerlangItem))); onReady() },
         onError
       ),
+      onSnapshot(
+        doc(db, 'config', 'kosten'),
+        (snap) => { setBudget(snap.exists() ? (snap.data().budget ?? null) : null); onReady() },
+        onError
+      ),
     ]
 
     // Offline detectie
@@ -99,7 +105,7 @@ export function useFirestoreSync() {
       window.removeEventListener('offline', handleOffline)
       window.removeEventListener('online', handleOnline)
     }
-  }, [setTodos, setKoop, setKosten, setRecurring, setPlanning, setMoveDate, setInspiratie, setDOzen, setVerlang])
+  }, [setTodos, setKoop, setKosten, setRecurring, setPlanning, setMoveDate, setInspiratie, setDOzen, setVerlang, setBudget])
 
   return status
 }

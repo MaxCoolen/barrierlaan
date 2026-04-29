@@ -8,20 +8,25 @@ import { stripUndefined } from '@/utils/stripUndefined'
 interface KostenState {
   items: KostenItem[]
   recurring: RecurringBill[]
+  budget: number | null
   _setItems: (items: KostenItem[]) => void
   _setRecurring: (recurring: RecurringBill[]) => void
+  _setBudget: (budget: number | null) => void
   addItem: (description: string, amount: number, category: KostenCategory, date?: string) => Promise<void>
   togglePaid: (id: string) => Promise<void>
   deleteItem: (id: string) => Promise<void>
   addRecurring: (name: string, amount: number, frequency: RecurringBill['frequency']) => Promise<void>
   deleteRecurring: (id: string) => Promise<void>
+  setBudget: (budget: number | null) => Promise<void>
 }
 
 export const useKostenStore = create<KostenState>()((set, get) => ({
   items: [],
   recurring: [],
+  budget: null,
   _setItems: (items) => set({ items }),
   _setRecurring: (recurring) => set({ recurring }),
+  _setBudget: (budget) => set({ budget }),
 
   addItem: async (description, amount, category, date) => {
     const item: KostenItem = {
@@ -57,5 +62,10 @@ export const useKostenStore = create<KostenState>()((set, get) => ({
   deleteRecurring: async (id) => {
     set((s) => ({ recurring: s.recurring.filter((r) => r.id !== id) }))
     await deleteDoc(doc(db, 'recurring', id))
+  },
+
+  setBudget: async (budget) => {
+    set({ budget })
+    await setDoc(doc(db, 'config', 'kosten'), { budget: budget ?? null }, { merge: true })
   },
 }))

@@ -8,7 +8,7 @@ import { stripUndefined } from '@/utils/stripUndefined'
 interface KoopState {
   items: KoopItem[]
   _setItems: (items: KoopItem[]) => void
-  addItem: (name: string, quantity: number, store?: string) => Promise<void>
+  addItem: (name: string, quantity: number, store?: string, url?: string) => Promise<void>
   toggleBought: (id: string) => Promise<void>
   deleteItem: (id: string) => Promise<void>
 }
@@ -17,9 +17,9 @@ export const useKoopStore = create<KoopState>()((set, get) => ({
   items: [],
   _setItems: (items) => set({ items }),
 
-  addItem: async (name, quantity, store) => {
+  addItem: async (name, quantity, store, url) => {
     const item: KoopItem = {
-      id: generateId(), name, quantity, store, bought: false,
+      id: generateId(), name, quantity, store, url, bought: false,
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [item, ...s.items] }))

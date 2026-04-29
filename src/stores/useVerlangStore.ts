@@ -9,6 +9,7 @@ interface VerlangState {
   items: VerlangItem[]
   _setItems: (items: VerlangItem[]) => void
   addItem: (title: string, priority: Priority, addedBy: Person, notes?: string, url?: string) => Promise<void>
+  updatePriority: (id: string, priority: Priority) => Promise<void>
   toggleAcquired: (id: string) => Promise<void>
   deleteItem: (id: string) => Promise<void>
 }
@@ -24,6 +25,11 @@ export const useVerlangStore = create<VerlangState>()((set, get) => ({
     }
     set((s) => ({ items: [item, ...s.items] }))
     await setDoc(doc(db, 'verlang', item.id), stripUndefined(item))
+  },
+
+  updatePriority: async (id, priority) => {
+    set((s) => ({ items: s.items.map((i) => i.id === id ? { ...i, priority } : i) }))
+    await setDoc(doc(db, 'verlang', id), { priority }, { merge: true })
   },
 
   toggleAcquired: async (id) => {
