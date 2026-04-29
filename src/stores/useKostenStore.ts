@@ -3,6 +3,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { KostenItem, KostenCategory, RecurringBill } from '@/types'
 import { generateId } from '@/utils/generateId'
+import { stripUndefined } from '@/utils/stripUndefined'
 
 interface KostenState {
   items: KostenItem[]
@@ -28,7 +29,7 @@ export const useKostenStore = create<KostenState>()((set, get) => ({
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [item, ...s.items] }))
-    await setDoc(doc(db, 'kosten', item.id), item)
+    await setDoc(doc(db, 'kosten', item.id), stripUndefined(item))
   },
 
   togglePaid: async (id) => {

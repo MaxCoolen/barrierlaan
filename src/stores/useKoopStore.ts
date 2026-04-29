@@ -3,6 +3,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { KoopItem } from '@/types'
 import { generateId } from '@/utils/generateId'
+import { stripUndefined } from '@/utils/stripUndefined'
 
 interface KoopState {
   items: KoopItem[]
@@ -22,7 +23,7 @@ export const useKoopStore = create<KoopState>()((set, get) => ({
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [item, ...s.items] }))
-    await setDoc(doc(db, 'kooplijst', item.id), item)
+    await setDoc(doc(db, 'kooplijst', item.id), stripUndefined(item))
   },
 
   toggleBought: async (id) => {

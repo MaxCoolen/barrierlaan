@@ -3,6 +3,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { VerlangItem, Priority, Person } from '@/types'
 import { generateId } from '@/utils/generateId'
+import { stripUndefined } from '@/utils/stripUndefined'
 
 interface VerlangState {
   items: VerlangItem[]
@@ -22,7 +23,7 @@ export const useVerlangStore = create<VerlangState>()((set, get) => ({
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [item, ...s.items] }))
-    await setDoc(doc(db, 'verlang', item.id), item)
+    await setDoc(doc(db, 'verlang', item.id), stripUndefined(item))
   },
 
   toggleAcquired: async (id) => {

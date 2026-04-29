@@ -3,6 +3,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { InspiratieItem, Person } from '@/types'
 import { generateId } from '@/utils/generateId'
+import { stripUndefined } from '@/utils/stripUndefined'
 
 interface InspiratieState {
   items: InspiratieItem[]
@@ -28,7 +29,7 @@ export const useInspiratieStore = create<InspiratieState>()((set, get) => ({
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [item, ...s.items] }))
-    await setDoc(doc(db, 'inspiratie', item.id), item)
+    await setDoc(doc(db, 'inspiratie', item.id), stripUndefined(item))
   },
 
   markAllRead: async () => {

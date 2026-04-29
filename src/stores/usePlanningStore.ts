@@ -3,6 +3,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { PlanningEvent } from '@/types'
 import { generateId } from '@/utils/generateId'
+import { stripUndefined } from '@/utils/stripUndefined'
 
 interface PlanningState {
   items: PlanningEvent[]
@@ -27,7 +28,7 @@ export const usePlanningStore = create<PlanningState>()((set, get) => ({
       createdAt: new Date().toISOString(),
     }
     set((s) => ({ items: [...s.items, event] }))
-    await setDoc(doc(db, 'planning', event.id), event)
+    await setDoc(doc(db, 'planning', event.id), stripUndefined(event))
   },
 
   toggleDone: async (id) => {

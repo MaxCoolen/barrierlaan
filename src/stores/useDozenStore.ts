@@ -3,6 +3,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { DozenItem, DozenStatus } from '@/types'
 import { generateId } from '@/utils/generateId'
+import { stripUndefined } from '@/utils/stripUndefined'
 
 interface DozenState {
   items: DozenItem[]
@@ -36,7 +37,7 @@ export const useDozenStore = create<DozenState>()((set, get) => ({
       items: [...s.items, item].sort((a, b) => a.number - b.number),
       nextNumber: Math.max(s.nextNumber, number + 1),
     }))
-    await setDoc(doc(db, 'dozen', item.id), item)
+    await setDoc(doc(db, 'dozen', item.id), stripUndefined(item))
   },
 
   updateItem: async (id, updates) => {
