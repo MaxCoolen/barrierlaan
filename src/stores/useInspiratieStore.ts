@@ -48,8 +48,19 @@ export const useInspiratieStore = create<InspiratieState>()((set, get) => ({
     const item = get().items.find((i) => i.id === id)
     if (!item) return
     const favorite = !item.favorite
-    set((s) => ({ items: s.items.map((i) => i.id === id ? { ...i, favorite } : i) }))
-    await setDoc(doc(db, 'inspiratie', id), { favorite }, { merge: true })
+    const shouldAddToVerlang = favorite && !item.addedToVerlang
+    set((s) => ({
+      items: s.items.map((i) => i.id === id
+        ? { ...i, favorite, addedToVerlang: shouldAddToVerlang ? true : i.addedToVerlang }
+        : i
+      ),
+    }))
+    const update: Record<string, unknown> = { favorite }
+    if (shouldAddToVerlang) update.addedToVerlang = true
+    await setDoc(doc(db, 'inspiratie', id), update, { merge: true })
+    if (shouldAddToVerlang) {
+      await useVerlangStore.getState().addItem(item.title, 'Middel', item.addedBy, item.notes, item.url)
+    }
   },
 
   toggleViewed: async (id) => {
@@ -60,29 +71,13 @@ export const useInspiratieStore = create<InspiratieState>()((set, get) => ({
   vote: async (id, voter, v) => {
     const item = get().items.find((i) => i.id === id)
     if (!item) return
-
     const existingVotes = item.votes ?? { max: null, medina: null }
     const updatedVotes = { ...existingVotes, [voter.toLowerCase()]: v }
-
-    // Check of beide nu 'ja' hebben gestemd en item nog niet is toegevoegd
-    const bothJa = updatedVotes.max === 'ja' && updatedVotes.medina === 'ja'
-    const shouldAddToVerlang = bothJa && !item.addedToVerlang
-
     set((s) => ({
-      items: s.items.map((i) => i.id === id
-        ? { ...i, votes: updatedVotes, addedToVerlang: shouldAddToVerlang ? true : i.addedToVerlang }
-        : i
-      ),
+      items: s.items.map((i) => i.id === id ? { ...i, votes: updatedVotes } : i),
     }))
-
     const field = `votes.${voter.toLowerCase()}`
-    const update: Record<string, unknown> = { [field]: v }
-    if (shouldAddToVerlang) update.addedToVerlang = true
-    await setDoc(doc(db, 'inspiratie', id), update, { merge: true })
-
-    if (shouldAddToVerlang) {
-      await useVerlangStore.getState().addItem(item.title, 'Middel', item.addedBy, item.notes, item.url)
-    }
+    await setDoc(doc(db, 'inspiratie', id), { [field]: v }, { merge: true })
   },
 
   addComment: async (id, author, text) => {

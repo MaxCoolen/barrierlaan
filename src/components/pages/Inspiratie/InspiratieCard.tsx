@@ -20,7 +20,7 @@ function getVoteConsensus(votes: InspiratieItem['votes']) {
 }
 
 const consensusBanner: Record<string, { text: string; className: string }> = {
-  'both-ja':   { text: '✨ Jullie zijn het eens — toegevoegd aan verlanglijst!', className: 'bg-olive-600/10 text-olive-700 border-olive-600/20' },
+  'both-ja':   { text: 'Jullie zijn het eens! ✨', className: 'bg-olive-600/10 text-olive-700 border-olive-600/20' },
   'both-nee':  { text: 'Allebei niet enthousiast', className: 'bg-sand-100 text-warm-gray border-sand-200' },
   'different': { text: 'Jullie zijn het niet eens 🤔', className: 'bg-terra-400/10 text-terra-500 border-terra-300/20' },
   'pending':   { text: '', className: '' },
@@ -53,11 +53,15 @@ export default function InspiratieCard({ item }: Props) {
   const otherName = currentUser === 'Max' ? 'Medina' : 'Max'
   const otherVote = currentUser === 'Max' ? votes.medina : votes.max
 
-  function handleFavorite() {
+  async function handleFavorite() {
     setHeartPopping(true)
     setTimeout(() => setHeartPopping(false), 300)
-    toggleFavorite(item.id)
-    toast(item.favorite ? 'Uit favorieten' : 'Aan favorieten toegevoegd! ♥')
+    await toggleFavorite(item.id)
+    if (!item.favorite && !item.addedToVerlang) {
+      toast('♥ Aan favorieten toegevoegd en op verlanglijst gezet!')
+    } else {
+      toast(item.favorite ? 'Uit favorieten' : '♥ Aan favorieten toegevoegd!')
+    }
   }
 
   function handleOpen() {
@@ -65,15 +69,10 @@ export default function InspiratieCard({ item }: Props) {
     window.open(item.url, '_blank', 'noopener,noreferrer')
   }
 
-  async function handleVote(v: 'ja' | 'nee') {
+  function handleVote(v: 'ja' | 'nee') {
     if (!currentUser) { toast('Selecteer eerst een gebruiker', 'info'); return }
-    await vote(item.id, currentUser, v)
-    const newVotes = { ...votes, [currentUser.toLowerCase()]: v }
-    if (newVotes.max === 'ja' && newVotes.medina === 'ja') {
-      toast('🎉 Jullie zijn het eens! Toegevoegd aan verlanglijst.')
-    } else {
-      toast(v === 'ja' ? '👍 Jij vindt dit mooi!' : '👎 Geen fan')
-    }
+    vote(item.id, currentUser, v)
+    toast(v === 'ja' ? '👍 Jij vindt dit mooi!' : '👎 Geen fan')
   }
 
   function handleCommentToggle() {
