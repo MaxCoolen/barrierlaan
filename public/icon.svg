@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Achtergrond -->
+  <rect width="512" height="512" fill="#C0714A"/>
+
+  <!-- Subtiele textuur stippen -->
+  <circle cx="60" cy="60" r="3" fill="#A85A33" opacity="0.4"/>
+  <circle cx="452" cy="80" r="4" fill="#A85A33" opacity="0.3"/>
+  <circle cx="40" cy="420" r="3" fill="#A85A33" opacity="0.3"/>
+  <circle cx="470" cy="400" r="5" fill="#A85A33" opacity="0.25"/>
+
+  <!-- Schoorsteen -->
+  <rect x="318" y="128" width="38" height="88" rx="4" fill="#F7F3EE"/>
+  <rect x="312" y="122" width="50" height="20" rx="5" fill="#EDE5D8"/>
+
+  <!-- Dak (driehoek) -->
+  <polygon points="256,90 76,268 436,268" fill="#F7F3EE"/>
+  <!-- Dak schaduwlijn -->
+  <polygon points="256,90 76,268 104,268 256,128 408,268 436,268" fill="#EDE5D8"/>
+
+  <!-- Muur -->
+  <rect x="110" y="256" width="292" height="196" rx="6" fill="#F7F3EE"/>
+
+  <!-- Linker raam -->
+  <rect x="142" y="292" width="76" height="64" rx="8" fill="#C0714A"/>
+  <line x1="180" y1="292" x2="180" y2="356" stroke="#A85A33" strokeWidth="3"/>
+  <line x1="142" y1="324" x2="218" y2="324" stroke="#A85A33" strokeWidth="3"/>
+
+  <!-- Rechter raam -->
+  <rect x="294" y="292" width="76" height="64" rx="8" fill="#C0714A"/>
+  <line x1="332" y1="292" x2="332" y2="356" stroke="#A85A33" strokeWidth="3"/>
+  <line x1="294" y1="324" x2="370" y2="324" stroke="#A85A33" strokeWidth="3"/>
+
+  <!-- Voordeur -->
+  <rect x="210" y="336" width="92" height="116" rx="46" fill="#C0714A"/>
+  <!-- Deurknop -->
+  <circle cx="244" cy="404" r="6" fill="#F7F3EE"/>
+
+  <!-- "78" tekst subtiel onderaan -->
+  <text x="256" y="490" font-family="Georgia, serif" font-size="28" font-weight="bold"
+        fill="#F7F3EE" text-anchor="middle" opacity="0.6">78</text>
+</svg>

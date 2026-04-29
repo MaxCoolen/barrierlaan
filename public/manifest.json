@@ -1,0 +1,36 @@
+{
+  "name": "Barriërlaan 78",
+  "short_name": "Barriërlaan",
+  "description": "Max & Medina's verhuisplanner",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F7F3EE",
+  "theme_color": "#C0714A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
